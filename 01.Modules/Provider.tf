@@ -13,7 +13,7 @@ terraform {
     resource_group_name  = "Tushar_Backend"
     storage_account_name = "ppipestoragetu491"
     container_name       = "ppipecontainer"
-    key                  = "tusharinfra.tfstate"
+    key                  = "tusharinfra_githubaction1.tfstate"
   }
 }
 
