@@ -27,17 +27,17 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init -input=false
-        working-directory: ./01.Modules
+        working-directory: 01.Modules
 
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
-        working-directory: ./01.Modules
+        working-directory: 01.Modules
         
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        working-directory: ./01.Modules
+        working-directory: 01.Modules
         
   terraform_apply:
    runs-on: windows-latest
@@ -53,11 +53,11 @@ jobs:
      - name: Terraform Init
        id: init
        run: terraform init -input=false
-       working-directory: ./01.Modules
+       working-directory: 01.Modules
 
      - name: Terraform apply
        id: apply_auto_approve
        run: terraform apply -auto-approve
-       working-directory: ./01.Modules
+       working-directory: 01.Modules
         
         
