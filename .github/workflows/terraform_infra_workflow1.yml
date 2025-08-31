@@ -27,27 +27,27 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init -input=false
-        working-directory: 01.Modules
+        working-directory: ./01.Modules
 
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
-        working-directory: 01.Modules
+        working-directory: ./01.Modules
         
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        working-directory: 01.Modules
+        working-directory: ./01.Modules
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: 01.Modules
+        working-directory: ./01.Modules
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
-          path: 01.Modules/tfplan
+          path: ./01.Modules/tfplan
 
         
   terraform_apply:
@@ -73,11 +73,11 @@ jobs:
      - name: Terraform Init
        id: init
        run: terraform init -input=false
-       working-directory: 01.Modules
+       working-directory: ./01.Modules
    
      - name: Terraform apply
        id: apply_auto_approve
        run: terraform apply -auto-approve
-       working-directory: 01.Modules
+       working-directory: ./01.Modules
         
         
