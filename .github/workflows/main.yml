@@ -1,0 +1,6 @@
+name: "terraform_infra_workflow"
+on: workflow_dispatch
+
+jobs:
+  terraform_init_job: 
+  runs-on: self_hosted
