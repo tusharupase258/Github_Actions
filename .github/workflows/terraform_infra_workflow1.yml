@@ -6,7 +6,7 @@ permissions:
   contents: read
   
 jobs:
-  terraform_init_job: 
+  terraform_init_plan_job: 
     runs-on: windows-latest
     steps: 
       - name: Checkout
@@ -23,3 +23,34 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.5
+          
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+        working-directory: 01.Modules
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        working-directory: 01.Modules
+        
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: 01.Modules
+        
+  terraform_apply:
+   runs-on: windows-latest
+   needs: terraform_init_plan_job
+   steps:
+     - name: Terraform Init
+       id: init
+       run: terraform init -input=false
+       working-directory: 01.Modules
+
+     - name: Terraform apply
+       id: apply_auto_approve
+       run: terraform apply -auto-approve
+       working-directory: 01.Modules
+        
+        
