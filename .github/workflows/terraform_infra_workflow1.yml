@@ -40,7 +40,20 @@ jobs:
         working-directory: ./01.Modules
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: |
+          terraform plan -out=tfplan
+          dir
+        working-directory: ./01.Modules
+
+      - name: Check if tfplan file exists
+        run: |
+          if (Test-Path "./tfplan") {
+            Write-Host "✅ tfplan file found."
+          } else {
+            Write-Host "❌ tfplan file NOT found."
+            exit 1
+          }
+        shell: pwsh
         working-directory: ./01.Modules
 
       - name: Upload Terraform Plan
@@ -80,6 +93,17 @@ jobs:
         with:
           name: terraform-plan
           path: ./01.Modules
+
+      - name: Check downloaded tfplan file
+        run: |
+          if (Test-Path "./tfplan") {
+            Write-Host "✅ tfplan file downloaded successfully."
+          } else {
+            Write-Host "❌ tfplan file NOT found after download."
+            exit 1
+          }
+        shell: pwsh
+        working-directory: ./01.Modules
 
       - name: Terraform Apply
         id: apply_auto_approve
