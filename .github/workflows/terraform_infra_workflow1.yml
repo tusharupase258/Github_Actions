@@ -47,37 +47,41 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
-          path: ./01.Modules/tfplan.binary
+          path: ./01.Modules/tfplan
 
-        
+
   terraform_apply:
-   runs-on: windows-latest
-   needs: terraform_init_plan_job
-   environment: production
-   steps:
-     - name: Checkout
-       uses: actions/checkout@v5.0.0
+    runs-on: windows-latest
+    needs: terraform_init_plan_job
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5.0.0
 
-     - name: Azure Login
-       uses: Azure/login@v2.3.0
-       with:
-         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-     
-     - name: Setup Terraform
-       uses: hashicorp/setup-terraform@v3
-       with:
-        terraform_version: 1.9.5
-        
-     - name: Terraform Init
-       id: init
-       run: terraform init -input=false
-       working-directory: ./01.Modules
-   
-     - name: Terraform apply
-       id: apply_auto_approve
-       run: terraform apply -auto-approve
-       working-directory: ./01.Modules
-        
-        
+      - name: Azure Login
+        uses: Azure/login@v2.3.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+        working-directory: ./01.Modules
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: ./01.Modules
+
+      - name: Terraform Apply
+        id: apply_auto_approve
+        run: terraform apply -auto-approve tfplan
+        working-directory: ./01.Modules
