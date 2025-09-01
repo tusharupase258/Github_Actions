@@ -25,48 +25,56 @@ jobs:
           terraform_version: 1.9.5
           
       - name: Terraform Init
-        id: init
         run: terraform init -input=false
         working-directory: ./01.Modules
 
       - name: Terraform fmt
-        id: fmt
         run: terraform fmt -check
         working-directory: ./01.Modules
         
       - name: Terraform Validate
-        id: validate
         run: terraform validate -no-color
         working-directory: ./01.Modules
 
       - name: Terraform Plan
-        run: |
-          terraform plan -out=tfplan
-          dir
+        run: terraform plan -out=tfplan.binary
         working-directory: ./01.Modules
 
       - name: Check if tfplan file exists
         run: |
-          if (Test-Path "./tfplan") {
-            Write-Host "✅ tfplan file found."
+          if (Test-Path "./tfplan.binary") {
+            Write-Host "✅ tfplan.binary file found."
           } else {
-            Write-Host "❌ tfplan file NOT found."
+            Write-Host "❌ tfplan.binary file NOT found."
             exit 1
           }
         shell: pwsh
         working-directory: ./01.Modules
 
-      - name: Upload Terraform Plan
+      # ✅ Create human-readable plan
+      - name: Terraform Show (save readable plan)
+        run: terraform show -no-color tfplan.binary > tfplan.txt
+        working-directory: ./01.Modules
+
+      # ✅ Upload binary plan
+      - name: Upload Terraform Plan (binary)
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
-          path: ./01.Modules/tfplan
+          path: ./01.Modules/tfplan.binary
+
+      # ✅ Upload text plan (for review)
+      - name: Upload Terraform Plan (text)
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-text
+          path: ./01.Modules/tfplan.txt
 
 
   terraform_apply:
     runs-on: windows-latest
     needs: terraform_init_plan_job
-    environment: production
+    environment: production   # 🔒 requires manual approval in GitHub Environments
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
@@ -84,11 +92,10 @@ jobs:
           terraform_version: 1.9.5
 
       - name: Terraform Init
-        id: init
         run: terraform init -input=false
         working-directory: ./01.Modules
 
-      - name: Download Terraform Plan
+      - name: Download Terraform Plan (binary)
         uses: actions/download-artifact@v4
         with:
           name: terraform-plan
@@ -96,16 +103,15 @@ jobs:
 
       - name: Check downloaded tfplan file
         run: |
-          if (Test-Path "./tfplan") {
-            Write-Host "✅ tfplan file downloaded successfully."
+          if (Test-Path "./tfplan.binary") {
+            Write-Host "✅ tfplan.binary downloaded successfully."
           } else {
-            Write-Host "❌ tfplan file NOT found after download."
+            Write-Host "❌ tfplan.binary NOT found after download."
             exit 1
           }
         shell: pwsh
         working-directory: ./01.Modules
 
       - name: Terraform Apply
-        id: apply_auto_approve
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve tfplan.binary
         working-directory: ./01.Modules
